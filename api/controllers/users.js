@@ -22,7 +22,7 @@ const login = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1m" }
     )
 
     // Generate Refresh Token (Long-lived)
@@ -65,7 +65,7 @@ const register = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1m" }
     )
 
     // Generate Refresh Token (Long-lived)
@@ -93,6 +93,8 @@ const register = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   try {
+    console.log("hello")
+    console.log(req.cookie)
     const { refreshToken } = req.cookies
     if (!refreshToken)
       return res.status(401).json({ message: "Unauthorized" })
@@ -129,11 +131,14 @@ const refreshToken = async (req, res) => {
 const fetchUserData = async (req, res) => {
   try {
     // use params
-    const userId = req.params.userId
+    const token = req.headers["authorization"]?.split(" ")[1] // Extract Bearer token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const userId = decoded.userId
     const user = await userModel.findById(userId)
     if (!user) {
       return res.status(404).json({ message: "User not found" })
     }
+    user.password = undefined
     return res.status(200).json({ user })
   } catch (err) {
     return res.status(500).json({ message: err.message })
