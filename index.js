@@ -4,11 +4,12 @@ const cors = require("cors")
 const logger = require("morgan")
 const bodyParser = require("body-parser")
 const mongoose = require("mongoose")
+const cookieParser = require("cookie-parser")
 const users = require("./routes/users")
 require("dotenv").config()
 
 const app = express()
-const server = http.createServer(app)
+app.use(cookieParser())
 
 app.use(
   cors({

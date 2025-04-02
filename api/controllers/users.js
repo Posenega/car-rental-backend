@@ -22,7 +22,7 @@ const login = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET,
-      { expiresIn: "1m" }
+      { expiresIn: "1h" }
     )
 
     // Generate Refresh Token (Long-lived)
@@ -65,7 +65,7 @@ const register = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET,
-      { expiresIn: "1m" }
+      { expiresIn: "1h" }
     )
 
     // Generate Refresh Token (Long-lived)
@@ -93,8 +93,6 @@ const register = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   try {
-    console.log("hello")
-    console.log(req.cookie)
     const { refreshToken } = req.cookies
     if (!refreshToken)
       return res.status(401).json({ message: "Unauthorized" })
@@ -145,9 +143,30 @@ const fetchUserData = async (req, res) => {
   }
 }
 
+const signout = async (req, res) => {
+  try {
+    const { refreshToken } = req.cookies
+    if (!refreshToken)
+      return res.status(401).json({ message: "Unauthorized" })
+
+    const storedToken = await tokenModel.findOne({
+      token: refreshToken,
+    })
+    if (!storedToken)
+      return res.status(403).json({ message: "Forbidden" })
+
+    await tokenModel.findOneAndDelete({ token: refreshToken })
+
+    return res.status(200).json({ message: "Signout Success" })
+  } catch (err) {
+    return res.status(500).json({ message: err.message })
+  }
+}
+
 module.exports = {
   login,
   register,
   refreshToken,
   fetchUserData,
+  signout,
 }
