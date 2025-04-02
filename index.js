@@ -6,6 +6,7 @@ const bodyParser = require("body-parser")
 const mongoose = require("mongoose")
 const cookieParser = require("cookie-parser")
 const users = require("./routes/users")
+const branch = require("./routes/branch")
 require("dotenv").config()
 
 const app = express()
@@ -13,7 +14,7 @@ app.use(cookieParser())
 
 app.use(
   cors({
-    origin: "http://localhost:3001",
+    origin: "http://localhost:3000",
     credentials: true,
   })
 )
@@ -32,8 +33,9 @@ mongoose
   })
 
 app.use("/users", users)
+app.use("/branch", branch)
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 8080
 app.listen(PORT, function () {
   console.log(`Server is running on Port: ${PORT}`)
 })

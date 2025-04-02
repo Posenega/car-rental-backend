@@ -1,4 +1,4 @@
-const userModel = require("../models/users").usreModel
+const userModel = require("../models/users").userModel
 const bcrypt = require("bcrypt")
 const tokenModel = require("../models/token")
 const jwt = require("jsonwebtoken")
@@ -83,6 +83,8 @@ const register = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     })
 
+    await tokenModel.create({ userId: user._id, token: refreshToken })
+
     // Return the access token
     return res.status(201).json({ accessToken })
   } catch (err) {
@@ -146,15 +148,16 @@ const fetchUserData = async (req, res) => {
 const signout = async (req, res) => {
   try {
     const { refreshToken } = req.cookies
-    if (!refreshToken)
+    if (!refreshToken) {
       return res.status(401).json({ message: "Unauthorized" })
+    }
 
     const storedToken = await tokenModel.findOne({
       token: refreshToken,
     })
-    if (!storedToken)
+    if (!storedToken) {
       return res.status(403).json({ message: "Forbidden" })
-
+    }
     await tokenModel.findOneAndDelete({ token: refreshToken })
 
     return res.status(200).json({ message: "Signout Success" })
