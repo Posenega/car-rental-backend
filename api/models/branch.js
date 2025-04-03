@@ -25,6 +25,10 @@ const BranchSchema = new mongoose.Schema({
     type: Object,
     required: true,
   },
+  branchImage: {
+    type: String,
+    required: true,
+  },
 })
 
 module.exports = {
