@@ -15,6 +15,7 @@ const login = async (req, res) => {
 
     const passwordMatch = bcrypt.compareSync(password, user.password)
     if (!passwordMatch) {
+      console.log(password)
       return res.status(401).json({ message: "Unauthorized" })
     }
 
@@ -39,7 +40,7 @@ const login = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "Strict",
+      sameSite: "strict",
     })
 
     return res.status(200).json({ accessToken })
@@ -79,7 +80,7 @@ const register = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true, // Prevents frontend JavaScript access (XSS protection)
       secure: false, // Only send over HTTPS
-      sameSite: "Strict", // Prevents CSRF attacks
+      sameSite: "strict", // Prevents CSRF attacks
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     })
 
@@ -149,6 +150,7 @@ const signout = async (req, res) => {
   try {
     const { refreshToken } = req.cookies
     if (!refreshToken) {
+      console.log(req.cookies)
       return res.status(401).json({ message: "Unauthorized" })
     }
 
@@ -166,10 +168,45 @@ const signout = async (req, res) => {
   }
 }
 
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"]
+  if (!authHeader) {
+    return res.status(401).json({ message: "Access token missing." })
+  }
+
+  const token = authHeader.split(" ")[1]
+  if (!token) {
+    return res.status(401).json({ message: "Access token missing." })
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res
+        .status(401)
+        .json({ message: "Invalid access token." })
+    }
+
+    req.user = decoded
+    next()
+  })
+}
+
+const verifyAdmin = (req, res, next) => {
+  // Assuming your token payload includes a "role" property
+  if (req.user && req.user.role === "admin") {
+    return next()
+  }
+  return res
+    .status(403)
+    .json({ message: "Access denied. Admins only." })
+}
+
 module.exports = {
   login,
   register,
   refreshToken,
   fetchUserData,
   signout,
+  verifyToken,
+  verifyAdmin,
 }

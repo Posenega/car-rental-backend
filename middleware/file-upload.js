@@ -18,7 +18,6 @@ const fileUpload = multer({
   },
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      console.log(req.body)
       const folder = req.body.mypathtofolder || "images" // fallback to 'images' if not provided
       const uploadPath = `uploads/${folder}`
       cb(null, uploadPath)

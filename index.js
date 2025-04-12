@@ -7,6 +7,7 @@ const mongoose = require("mongoose")
 const cookieParser = require("cookie-parser")
 const users = require("./routes/users")
 const branch = require("./routes/branch")
+const car = require("./routes/car")
 require("dotenv").config()
 
 const app = express()
@@ -34,6 +35,7 @@ mongoose
 
 app.use("/users", users)
 app.use("/branch", branch)
+app.use("/car", car)
 
 const PORT = process.env.PORT || 8080
 app.listen(PORT, function () {
