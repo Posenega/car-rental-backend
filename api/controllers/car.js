@@ -83,7 +83,7 @@ async function getAll(req, res) {
 async function getFilteredCars(req, res) {
   try {
     const filters = req.query // or wherever the filters are coming from
-
+    console.log(filters)
     const query = {}
 
     // Type (exact match)
@@ -98,9 +98,9 @@ async function getFilteredCars(req, res) {
     ) {
       query.carRentalPrice = {}
       if (filters.minPrice !== undefined)
-        query.carRentalPrice.$gte = filters.minPrice
+        query.carRentalPrice.$gte = JSON.parse(filters.minPrice)
       if (filters.maxPrice !== undefined)
-        query.carRentalPrice.$lte = filters.maxPrice
+        query.carRentalPrice.$lte = JSON.parse(filters.maxPrice)
     }
 
     // Engine Range (as string, still filterable if converted to number)
@@ -116,8 +116,8 @@ async function getFilteredCars(req, res) {
 
       if (!isNaN(min) || !isNaN(max)) {
         query.engineRange = {
-          $gte: filters.minEngineSize,
-          $lte: filters.maxEngineSize,
+          $gte: JSON.parse(filters.minEngineSize),
+          $lte: JSON.parse(filters.maxEngineSize),
         }
       }
     }
@@ -128,8 +128,8 @@ async function getFilteredCars(req, res) {
     }
 
     // Passenger capacity (exact match)
-    if (filters.passengerCapacity) {
-      query.passengerCapacity = filters.passengerCapacity
+    if (filters.numberOfPassenger) {
+      query.passengerCapacity = filters.numberOfPassenger
     }
 
     // Fuel type
@@ -138,13 +138,13 @@ async function getFilteredCars(req, res) {
     }
 
     // Transmission
-    if (filters.transmission) {
-      query.transmission = filters.transmission
+    if (filters.gearboxType) {
+      query.transmission = filters.gearboxType
     }
 
     // Air Conditioning (true/false stored as string like "true"/"false")
-    if (filters.airConditioning !== undefined) {
-      query.airConditioning = filters.airConditioning.toString()
+    if (filters.ac !== undefined) {
+      query.airConditioning = filters.ac.toString()
     }
 
     // Electric Windows (true/false stored as string like "true"/"false")
@@ -152,8 +152,29 @@ async function getFilteredCars(req, res) {
       query.electricWindows = filters.electricWindows.toString()
     }
 
+    console.log("Query: ", query)
+
     // Final query
     const cars = await CarModel.find(query)
+    return res.status(200).json({ message: "success", cars })
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({ message: err.message, cars: [] })
+  }
+}
+
+async function getCarsByCategory(req, res) {
+  try {
+    const category = req.params.category
+    // non case sensitive search
+    console.log(category)
+    const cars = await CarModel.find({
+      type: { $regex: new RegExp(category, "i") },
+    })
+    if (!cars)
+      return res
+        .status(404)
+        .json({ message: "No cars found", cars: [] })
     return res.status(200).json({ message: "success", cars })
   } catch (err) {
     console.log(err)
@@ -165,4 +186,5 @@ module.exports = {
   createCar,
   getAll,
   getFilteredCars,
+  getCarsByCategory,
 }

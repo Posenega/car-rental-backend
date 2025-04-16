@@ -52,8 +52,8 @@ const CarSchema = new Schema({
     default: "",
   },
   engineRange: {
-    type: String,
-    default: "",
+    type: Number,
+    default: 0,
   },
   fuelType: {
     type: String,
