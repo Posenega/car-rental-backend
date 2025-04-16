@@ -80,7 +80,89 @@ async function getAll(req, res) {
   }
 }
 
+async function getFilteredCars(req, res) {
+  try {
+    const filters = req.body // or wherever the filters are coming from
+
+    const query = {}
+
+    // Type (exact match)
+    if (filters.type) {
+      query.type = filters.type
+    }
+
+    // Price range (filter fixed price field)
+    if (
+      filters.minPrice !== undefined ||
+      filters.maxPrice !== undefined
+    ) {
+      query.carRentalPrice = {}
+      if (filters.minPrice !== undefined)
+        query.carRentalPrice.$gte = filters.minPrice
+      if (filters.maxPrice !== undefined)
+        query.carRentalPrice.$lte = filters.maxPrice
+    }
+
+    // Engine Range (as string, still filterable if converted to number)
+    if (
+      filters.minEngineSize !== undefined ||
+      filters.maxEngineSize !== undefined
+    ) {
+      query.engineRange = {}
+
+      // Assuming engineRange is a number in a string format (like "1.6" or "2.0")
+      const min = parseFloat(filters.minEngineSize)
+      const max = parseFloat(filters.maxEngineSize)
+
+      if (!isNaN(min) || !isNaN(max)) {
+        query.engineRange = {
+          $gte: filters.minEngineSize,
+          $lte: filters.maxEngineSize,
+        }
+      }
+    }
+
+    // Number of doors (exact match)
+    if (filters.numberOfDoors) {
+      query.numberOfDoors = filters.numberOfDoors
+    }
+
+    // Passenger capacity (exact match)
+    if (filters.passengerCapacity) {
+      query.passengerCapacity = filters.passengerCapacity
+    }
+
+    // Fuel type
+    if (filters.fuelType) {
+      query.fuelType = filters.fuelType
+    }
+
+    // Transmission
+    if (filters.transmission) {
+      query.transmission = filters.transmission
+    }
+
+    // Air Conditioning (true/false stored as string like "true"/"false")
+    if (filters.airConditioning !== undefined) {
+      query.airConditioning = filters.airConditioning.toString()
+    }
+
+    // Electric Windows (true/false stored as string like "true"/"false")
+    if (filters.electricWindows !== undefined) {
+      query.electricWindows = filters.electricWindows.toString()
+    }
+
+    // Final query
+    const cars = await CarModel.find(query)
+    return res.status(200).json({ message: "success", cars })
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({ message: err.message, cars: [] })
+  }
+}
+
 module.exports = {
   createCar,
   getAll,
+  getFilteredCars,
 }

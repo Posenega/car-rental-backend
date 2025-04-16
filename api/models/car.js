@@ -107,6 +107,10 @@ const CarSchema = new Schema({
     type: ServicesPriceSchema,
     default: {},
   },
+  type: {
+    type: String,
+    default: "",
+  },
 })
 
 module.exports = {

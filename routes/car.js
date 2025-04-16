@@ -9,5 +9,6 @@ router.post(
   carController.createCar
 )
 router.get("/", carController.getAll)
+router.get("/filtered", carController.getFilteredCars)
 
 module.exports = router
