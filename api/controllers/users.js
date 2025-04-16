@@ -201,6 +201,30 @@ const verifyAdmin = (req, res, next) => {
     .json({ message: "Access denied. Admins only." })
 }
 
+const uploadUserProfileImage = async (req, res) => {
+  try {
+    const { userId } = req.body
+    const file = req.file
+
+    if (!file) {
+      return res.status(400).json({ message: "No file uploaded" })
+    }
+
+    // Assuming you want to save the image path in the database
+    const imagePath = `/uploads/userImage/${file.filename}`
+
+    // Update user profile with the image path
+    await userModel.findByIdAndUpdate(userId, { image: imagePath })
+
+    return res.status(200).json({
+      message: "Profile image uploaded successfully",
+      imagePath,
+    })
+  } catch (err) {
+    return res.status(500).json({ message: err.message })
+  }
+}
+
 module.exports = {
   login,
   register,
@@ -209,4 +233,5 @@ module.exports = {
   signout,
   verifyToken,
   verifyAdmin,
+  uploadUserProfileImage,
 }

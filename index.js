@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser")
 const users = require("./routes/users")
 const branch = require("./routes/branch")
 const car = require("./routes/car")
+const path = require("path")
 require("dotenv").config()
 
 const app = express()
@@ -32,6 +33,8 @@ mongoose
     console.log("DB Connection Error", err)
     process.exit(1)
   })
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
 app.use("/users", users)
 app.use("/branch", branch)

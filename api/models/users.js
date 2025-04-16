@@ -21,6 +21,14 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  points: {
+    type: Number,
+    default: 0,
+  },
+  image: {
+    type: String,
+    default: "",
+  },
 })
 
 UserSchema.pre("save", function (next) {

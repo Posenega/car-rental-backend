@@ -19,7 +19,13 @@ const fileUpload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
       const folder = req.body.mypathtofolder || "images" // fallback to 'images' if not provided
-      const uploadPath = `uploads/${folder}`
+      const uploadPath = path.join("uploads", folder)
+
+      // Ensure the directory exists
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true })
+      }
+
       cb(null, uploadPath)
     },
     filename: (req, file, cb) => {
