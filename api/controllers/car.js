@@ -82,7 +82,7 @@ async function getAll(req, res) {
 
 async function getFilteredCars(req, res) {
   try {
-    const filters = req.body // or wherever the filters are coming from
+    const filters = req.query // or wherever the filters are coming from
 
     const query = {}
 
