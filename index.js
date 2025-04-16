@@ -6,6 +6,9 @@ const bodyParser = require("body-parser")
 const mongoose = require("mongoose")
 const cookieParser = require("cookie-parser")
 const users = require("./routes/users")
+const branch = require("./routes/branch")
+const car = require("./routes/car")
+const path = require("path")
 require("dotenv").config()
 
 const app = express()
@@ -13,7 +16,7 @@ app.use(cookieParser())
 
 app.use(
   cors({
-    origin: "http://localhost:3001",
+    origin: "http://localhost:3000",
     credentials: true,
   })
 )
@@ -31,9 +34,13 @@ mongoose
     process.exit(1)
   })
 
-app.use("/users", users)
+app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
-const PORT = process.env.PORT || 3000
+app.use("/users", users)
+app.use("/branch", branch)
+app.use("/car", car)
+
+const PORT = process.env.PORT || 8080
 app.listen(PORT, function () {
   console.log(`Server is running on Port: ${PORT}`)
 })

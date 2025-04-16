@@ -17,6 +17,18 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  points: {
+    type: Number,
+    default: 0,
+  },
+  image: {
+    type: String,
+    default: "",
+  },
 })
 
 UserSchema.pre("save", function (next) {
@@ -25,5 +37,5 @@ UserSchema.pre("save", function (next) {
 })
 module.exports = {
   UserSchema: UserSchema,
-  usreModel: mongoose.model("User", UserSchema),
+  userModel: mongoose.model("User", UserSchema),
 }
