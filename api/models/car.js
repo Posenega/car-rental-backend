@@ -68,8 +68,8 @@ const CarSchema = new Schema({
     default: "",
   },
   passengerCapacity: {
-    type: String,
-    default: "",
+    type: Number,
+    default: 0,
   },
   numberOfDoors: {
     type: String,

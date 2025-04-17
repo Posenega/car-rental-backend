@@ -128,8 +128,10 @@ async function getFilteredCars(req, res) {
     }
 
     // Passenger capacity (exact match)
-    if (filters.numberOfPassenger) {
-      query.passengerCapacity = filters.numberOfPassenger
+    if (filters.numberOfPassengers) {
+      query.passengerCapacity = {
+        $gte: parseInt(filters.numberOfPassengers),
+      }
     }
 
     // Fuel type
