@@ -4,20 +4,29 @@ const { Schema } = mongoose
 const OrderSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
-    ref: "User", // assuming you have a User model
+    ref: "User",
     required: true,
   },
   carId: {
     type: Schema.Types.ObjectId,
-    ref: "Car", // reference to your Car model
+    ref: "Car",
     required: true,
   },
-  startDate: {
-    type: Date,
+  // ✅ New fields from the form:
+  fullName: {
+    type: String,
     required: true,
   },
-  endDate: {
-    type: Date,
+  age: {
+    type: Number,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  mobileNumber: {
+    type: String,
     required: true,
   },
   pickupLocation: {
@@ -28,16 +37,35 @@ const OrderSchema = new Schema({
     type: String,
     required: true,
   },
+  startDate: {
+    type: Date,
+    required: true,
+  },
+  endDate: {
+    type: Date,
+    required: true,
+  },
+  pickupTime: {
+    type: String, // e.g., "12:30 PM"
+    required: true,
+  },
+  fuelOption: {
+    type: {
+      type: String,
+      enum: ["prepaid", "postpaid"],
+    },
+    price: { type: Number },
+  },
   selectedInsurance: {
-    full: { type: Boolean, default: false },
-    tiresAndWindscreen: { type: Boolean, default: false },
-    insuranceForDriver: { type: Boolean, default: false },
+    full: { type: Number, default: 0 },
+    tiresAndWindscreen: { type: Number, default: 0 },
+    insuranceForDriver: { type: Number, default: 0 },
   },
   selectedServices: {
-    chauffeur: { type: Boolean, default: false },
-    childSeat: { type: Boolean, default: false },
-    sateliteNavigation: { type: Boolean, default: false },
-    gps: { type: Boolean, default: false },
+    chauffeur: { type: Number, default: 0 },
+    childSeat: { type: Number, default: 0 },
+    satelliteNavigation: { type: Number, default: 0 },
+    gps: { type: Number, default: 0 },
   },
   totalPrice: {
     type: Number,
@@ -49,12 +77,16 @@ const OrderSchema = new Schema({
     default: "pending",
   },
   invoiceUrl: {
-    type: String, // can be a full URL or a path (e.g., /invoices/order123.pdf)
+    type: String,
     default: "",
   },
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  car: {
+    type: Object,
+    default: {},
   },
 })
 
