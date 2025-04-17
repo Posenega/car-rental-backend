@@ -195,9 +195,50 @@ async function getCarsByCategory(req, res) {
   }
 }
 
+async function getCarById(req, res) {
+  try {
+    const carId = req.params.id
+    const car = await CarModel.findById(carId)
+    if (!car)
+      return res
+        .status(404)
+        .json({ message: "Car not found", car: null })
+    return res.status(200).json({ message: "success", car })
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({ message: err.message, car: null })
+  }
+}
+
+async function getAverageRentalPrice(req, res) {
+  try {
+    const result = await CarModel.aggregate([
+      {
+        $group: {
+          _id: null, // ← required placeholder
+          averagePrice: { $avg: "$carRentalPrice" },
+        },
+      },
+    ])
+    console.log(result)
+
+    return res
+      .status(200)
+      .json(result.length ? result[0].averagePrice : 0)
+  } catch (err) {
+    console.error("Error calculating average rental price:", err)
+    return res.status(500).json({
+      message: "Error calculating average rental price",
+      error: err.message,
+    })
+  }
+}
+
 module.exports = {
   createCar,
   getAll,
   getFilteredCars,
   getCarsByCategory,
+  getCarById,
+  getAverageRentalPrice,
 }
