@@ -8,6 +8,8 @@ const cookieParser = require("cookie-parser")
 const users = require("./routes/users")
 const branch = require("./routes/branch")
 const car = require("./routes/car")
+const review = require("./routes/review")
+
 const path = require("path")
 require("dotenv").config()
 
@@ -39,6 +41,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 app.use("/users", users)
 app.use("/branch", branch)
 app.use("/car", car)
+app.use("/reviews", review)
 
 const PORT = process.env.PORT || 8080
 app.listen(PORT, function () {
