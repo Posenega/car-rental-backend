@@ -67,8 +67,19 @@ async function createCar(req, res) {
 }
 
 async function getAll(req, res) {
+
   try {
-    const cars = await CarModel.find()
+    const { entry } = req.params
+
+    var cars = []
+    if (entry !== "undefined") {
+      cars = await CarModel.find({
+        carName: { $regex: entry, $options: "i" } // "i" for case-insensitive
+      });
+    } else {
+      cars = await CarModel.find();
+
+    }
     if (!cars)
       return res
         .status(404)

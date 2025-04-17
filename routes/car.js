@@ -8,7 +8,7 @@ router.post(
   fileUpload.single("carImage"),
   carController.createCar
 )
-router.get("/", carController.getAll)
+router.get("/all/:entry", carController.getAll)
 router.get("/filtered", carController.getFilteredCars)
 router.get("/category/:category", carController.getCarsByCategory)
 
