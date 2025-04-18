@@ -82,7 +82,10 @@ async function createOrder(req, res) {
 
 async function getOrders(req, res) {
   try {
-    const orders = await Order.find({ userId: req.params.userId })
+    const orders = await Order.find({
+      userId: req.params.userId,
+      paymentStatus: "pending", // Only fetch pending orders
+    })
     if (!orders) {
       return res.status(404).json({
         message: "No orders found",
@@ -100,6 +103,7 @@ async function getOrders(req, res) {
   }
 }
 
+const { generatePDF } = require("../../middleware/pdf-generator")
 const car = require("../models/car")
 const { orderModel } = require("../models/order")
 
@@ -168,15 +172,42 @@ async function validateOrder(req, res) {
         message: "No order found",
       })
     }
+    const pdf = await generatePDF(order)
     order.paymentStatus = "paid"
+    order.invoiceUrl = pdf.filePath
+    console.log("Invoice URL:", pdf.filePath)
+    console.log("New Order:", order.invoiceUrl)
+
     await order.save()
     return res.status(200).json({
       message: "Order validated successfully",
       order,
     })
   } catch (err) {
+    console.error("Error validating order:", err)
     return res.status(500).json({
       message: "Error validating order",
+      error: err.message,
+    })
+  }
+}
+
+async function makePDF(req, res) {
+  try {
+    const order = await Order.findById(req.params.orderId)
+    if (!order) {
+      return res.status(404).json({
+        message: "No order found",
+      })
+    }
+    const pdf = await generatePDF(order)
+    return res.status(200).json({
+      message: "PDF generated successfully",
+      pdf,
+    })
+  } catch (err) {
+    return res.status(500).json({
+      message: "Error generating PDF",
       error: err.message,
     })
   }
@@ -208,7 +239,9 @@ async function deleteOrder(req, res) {
     if (!deleted) {
       return res.status(404).json({ message: "Order not found" })
     }
-    return res.status(200).json({ message: "Order deleted successfully" })
+    return res
+      .status(200)
+      .json({ message: "Order deleted successfully" })
   } catch (err) {
     console.error("Error deleting order:", err)
     return res.status(500).json({ message: "Server error" })
@@ -223,5 +256,5 @@ module.exports = {
   validateOrder,
   deleteOrder,
   getPaidOrders,
-
+  makePDF,
 }
