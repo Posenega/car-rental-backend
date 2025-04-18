@@ -8,5 +8,7 @@ router.get(
   "/getMostReservedCarId",
   orderController.getMostReservedCarId
 )
+router.get("/:orderId", orderController.getOrder)
+router.post("/validate/:orderId", orderController.validateOrder)
 
 module.exports = router

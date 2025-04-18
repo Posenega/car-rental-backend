@@ -140,8 +140,52 @@ async function getMostReservedCarId(req, res) {
   }
 }
 
+async function getOrder(req, res) {
+  try {
+    const order = await Order.findById(req.params.orderId)
+    if (!order) {
+      return res.status(404).json({
+        message: "No order found",
+      })
+    }
+    return res.status(200).json({
+      message: "Order fetched successfully",
+      order,
+    })
+  } catch (err) {
+    return res.status(500).json({
+      message: "Error fetching order",
+      error: err.message,
+    })
+  }
+}
+
+async function validateOrder(req, res) {
+  try {
+    const order = await Order.findById(req.params.orderId)
+    if (!order) {
+      return res.status(404).json({
+        message: "No order found",
+      })
+    }
+    order.paymentStatus = "paid"
+    await order.save()
+    return res.status(200).json({
+      message: "Order validated successfully",
+      order,
+    })
+  } catch (err) {
+    return res.status(500).json({
+      message: "Error validating order",
+      error: err.message,
+    })
+  }
+}
+
 module.exports = {
   createOrder,
   getOrders,
   getMostReservedCarId,
+  getOrder,
+  validateOrder,
 }
