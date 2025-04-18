@@ -182,10 +182,46 @@ async function validateOrder(req, res) {
   }
 }
 
+async function getPaidOrders(req, res) {
+  try {
+    const { userId } = req.params
+    // Optional: You can also verify the user has permission to delete this order
+    const orders = await Order.find({
+      userId: userId,
+      paymentStatus: "paid",
+    })
+    if (!orders) {
+      return res.status(404).json({ message: "Orders not found" })
+    }
+    return res.status(200).json({ message: "successfully", orders })
+  } catch (err) {
+    console.error("Error fetching orders:", err)
+    return res.status(500).json({ message: "Server error" })
+  }
+}
+
+async function deleteOrder(req, res) {
+  try {
+    const { orderId } = req.params
+    // Optional: You can also verify the user has permission to delete this order
+    const deleted = await Order.findByIdAndDelete(orderId)
+    if (!deleted) {
+      return res.status(404).json({ message: "Order not found" })
+    }
+    return res.status(200).json({ message: "Order deleted successfully" })
+  } catch (err) {
+    console.error("Error deleting order:", err)
+    return res.status(500).json({ message: "Server error" })
+  }
+}
+
 module.exports = {
   createOrder,
   getOrders,
   getMostReservedCarId,
   getOrder,
   validateOrder,
+  deleteOrder,
+  getPaidOrders,
+
 }

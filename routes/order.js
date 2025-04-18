@@ -10,5 +10,7 @@ router.get(
 )
 router.get("/:orderId", orderController.getOrder)
 router.post("/validate/:orderId", orderController.validateOrder)
+router.delete("/:orderId", orderController.deleteOrder)
+router.get("/paid/:userId", orderController.getPaidOrders)
 
 module.exports = router
