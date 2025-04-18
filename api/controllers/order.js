@@ -196,10 +196,11 @@ async function validateOrder(req, res) {
 
       // Mark coupon as used
       coupon.used = true
+      console.log("Coupon used:", coupon)
       await coupon.save()
     }
     order.paymentStatus = "paid"
-    if (order.totalPrice !== req.body.totalPrice) {
+    if (order.totalPrice !== req.body.totalPrice && !couponCode) {
       await userModel.findByIdAndUpdate(order.userId, {
         points: 0,
       })
