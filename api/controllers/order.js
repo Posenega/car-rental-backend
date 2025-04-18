@@ -1,5 +1,6 @@
 const Order = require("../models/order").orderModel
 const Car = require("../models/car").carModel
+const userModel = require("../models/users").userModel
 
 async function createOrder(req, res) {
   try {
@@ -67,6 +68,7 @@ async function createOrder(req, res) {
     })
 
     await order.save()
+
     return res.status(201).json({
       message: "Order created successfully",
       order,
@@ -172,13 +174,27 @@ async function validateOrder(req, res) {
         message: "No order found",
       })
     }
-    const pdf = await generatePDF(order)
     order.paymentStatus = "paid"
+    if (order.totalPrice !== req.body.totalPrice) {
+      await userModel.findByIdAndUpdate(order.userId, {
+        points: 0
+      })
+    } else {
+      //points
+      await userModel.findByIdAndUpdate(order.userId, {
+        $inc: { points: Math.floor(order.totalPrice / 10) }
+      })
+    }
+    order.totalPrice = req.body.totalPrice
+    const pdf = await generatePDF(order)
     order.invoiceUrl = pdf.filePath
     console.log("Invoice URL:", pdf.filePath)
     console.log("New Order:", order.invoiceUrl)
 
+
+
     await order.save()
+
     return res.status(200).json({
       message: "Order validated successfully",
       order,
