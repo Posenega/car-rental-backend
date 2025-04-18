@@ -10,5 +10,6 @@ router.post(
 )
 router.get("/getAll", branchController.getBranches)
 router.delete("/delete/:id", branchController.deleteBranch)
+router.get("/:id", branchController.getBranch)
 
 module.exports = router

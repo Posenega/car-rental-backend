@@ -40,6 +40,21 @@ async function getBranches(req, res, next) {
     })
   }
 }
+async function getBranch(req, res) {
+  try {
+    const branch = await BranchModel.findById(req.params.id)
+    res.status(200).json({
+      message: "Branch fetched successfully",
+      branch,
+    })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({
+      message: "Internal server error",
+      error: err.message,
+    })
+  }
+}
 
 async function deleteBranch(req, res, next) {
   try {
@@ -70,4 +85,5 @@ module.exports = {
   create,
   getBranches,
   deleteBranch,
+  getBranch,
 }
