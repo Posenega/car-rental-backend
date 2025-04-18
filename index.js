@@ -10,6 +10,7 @@ const branch = require("./routes/branch")
 const car = require("./routes/car")
 const order = require("./routes/order")
 const review = require("./routes/review")
+const coupon = require("./routes/coupon")
 
 const path = require("path")
 require("dotenv").config()
@@ -44,6 +45,7 @@ app.use("/branch", branch)
 app.use("/car", car)
 app.use("/order", order)
 app.use("/reviews", review)
+app.use("/coupons", coupon)
 
 const PORT = process.env.PORT || 8080
 app.listen(PORT, function () {

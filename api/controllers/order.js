@@ -1,5 +1,6 @@
 const Order = require("../models/order").orderModel
 const Car = require("../models/car").carModel
+const { couponModel } = require("../models/coupon")
 
 async function createOrder(req, res) {
   try {
@@ -166,11 +167,34 @@ async function getOrder(req, res) {
 
 async function validateOrder(req, res) {
   try {
+    const { couponCode } = req.body
     const order = await Order.findById(req.params.orderId)
     if (!order) {
       return res.status(404).json({
         message: "No order found",
       })
+    }
+    if (couponCode) {
+      const coupon = await couponModel.findOne({
+        code: couponCode.toUpperCase(),
+        used: false,
+      })
+
+      if (!coupon) {
+        return res
+          .status(404)
+          .json({ message: "Invalid or already used coupon" })
+      }
+
+      // Apply discount
+      order.totalPrice = Math.max(
+        0,
+        order.totalPrice * (coupon.discountAmount / 100)
+      )
+
+      // Mark coupon as used
+      coupon.used = true
+      await coupon.save()
     }
     const pdf = await generatePDF(order)
     order.paymentStatus = "paid"
